@@ -1,0 +1,197 @@
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+
+class UneFenetre extends JFrame implements ActionListener
+{
+    UnMobile sonMobile;
+    UnMobile sonMobile2;
+    UnMobile sonMobile3;
+    UnMobile sonMobile4;
+    
+    Thread laTache;
+    Thread laTache2;
+    Thread laTache3;
+    Thread laTache4;
+    
+    JButton boutonSuspend;
+    JButton boutonSuspend2;
+    JButton boutonSuspend3;
+    JButton boutonSuspend4;
+    
+    private final int LARG=400, HAUT=250;
+    
+    public UneFenetre()
+    {
+    	///ajouter sonMobile a la fenetre
+    	///creer une thread laThread avec sonMobile
+    	///afficher la fenetre
+    	///lancer laThread
+    
+    this.setLayout(new GridLayout(4,4));
+    
+    sonMobile=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile);
+    
+    boutonSuspend=new JButton("mettre en arrêt ou en marche"); 
+	boutonSuspend.addActionListener(this);
+	boutonSuspend.setSize(2,2);
+    this.add(boutonSuspend);
+    
+    sonMobile2=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile2);
+    
+    boutonSuspend2=new JButton("mettre en arrêt ou en marche2"); 
+	boutonSuspend2.addActionListener(this);
+	boutonSuspend2.setSize(2,2);
+	this.add(boutonSuspend2);
+	
+	sonMobile3=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile3);
+    
+    boutonSuspend3=new JButton("mettre en arrêt ou en marche3"); 
+	boutonSuspend3.addActionListener(this);
+	boutonSuspend3.setSize(2,2);
+    this.add(boutonSuspend3);
+    
+    sonMobile4=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile4);
+    
+    boutonSuspend4=new JButton("mettre en arrêt ou en marche4"); 
+	boutonSuspend4.addActionListener(this);
+	boutonSuspend4.setSize(2,2);
+	this.add(boutonSuspend4);
+    
+    this.setSize(800,800);	
+
+	laTache = new Thread(sonMobile);
+	laTache.start();
+
+	laTache2 = new Thread(sonMobile2);
+	laTache2.start();
+
+	laTache3 = new Thread(sonMobile3);
+	laTache3.start();
+
+	laTache4 = new Thread(sonMobile4);
+	laTache4.start();
+	
+
+	this.setVisible(true);
+
+
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+		if(sonMobile.getActivite()==true && e.getSource()==boutonSuspend){
+			sonMobile.setActivite(false);
+			laTache.suspend();
+
+		}
+		else if(sonMobile.getActivite()==false && e.getSource()==boutonSuspend){
+			sonMobile.setActivite(true);
+			laTache.resume();
+
+		}
+		
+		if(sonMobile2.getActivite()==true && e.getSource()==boutonSuspend2){
+			sonMobile2.setActivite(false);
+			laTache2.suspend();
+
+		}
+		else if(sonMobile2.getActivite()==false && e.getSource()==boutonSuspend2){
+			sonMobile2.setActivite(true);
+			laTache2.resume();
+
+		}
+		
+		if(sonMobile3.getActivite()==true && e.getSource()==boutonSuspend3){
+			sonMobile3.setActivite(false);
+			laTache3.suspend();
+
+		}
+		else if(sonMobile3.getActivite()==false && e.getSource()==boutonSuspend3){
+			sonMobile3.setActivite(true);
+			laTache3.resume();
+
+		}
+		
+		if(sonMobile4.getActivite()==true && e.getSource()==boutonSuspend4){
+			sonMobile4.setActivite(false);
+			laTache4.suspend();
+
+		}
+		else if(sonMobile4.getActivite()==false && e.getSource()==boutonSuspend4){
+			sonMobile4.setActivite(true);
+			laTache4.resume();
+
+		}
+		
+	}
+}
+
+
+class UnMobile extends JPanel implements Runnable
+{
+    int saLargeur, saHauteur, sonDebDessin;
+    final int sonPas = 10, sonTemps=50, sonCote=40;
+    boolean activite;
+    UnMobile(int telleLargeur, int telleHauteur)
+    {
+	super();
+	saLargeur = telleLargeur;
+	saHauteur = telleHauteur;
+	setSize(telleLargeur, telleHauteur);
+    }
+
+    public void run()
+    {
+    activite=true;
+    while(true){
+    	for (sonDebDessin=0; sonDebDessin < saLargeur - sonPas; sonDebDessin+= sonPas)
+	    	{
+			repaint();
+			try{Thread.sleep(sonTemps);}
+			catch (InterruptedException telleExcp)
+		    	{telleExcp.printStackTrace();}
+	    	}
+    	for (sonDebDessin=400; sonDebDessin > 0; sonDebDessin-= sonPas)
+    	{
+		repaint();
+		try{Thread.sleep(sonTemps);}
+		catch (InterruptedException telleExcp)
+	    	{telleExcp.printStackTrace();}
+		}
+		}
+    }
+	 
+
+    public void paintComponent(Graphics telCG)
+    {
+	super.paintComponent(telCG);
+	telCG.fillRect(sonDebDessin, saHauteur/2, sonCote, sonCote);
+    }
+    
+    public boolean getActivite(){
+    	return activite;
+    }
+    
+    public void setActivite(boolean bool){
+    	this.activite=bool;
+    }
+}
+
+public class TpMobile
+{
+    public static void main(String[] telsArgs) 
+    {
+	new UneFenetre();
+ 	
+    }
+}
+
+
