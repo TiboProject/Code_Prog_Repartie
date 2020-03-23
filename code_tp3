@@ -1,0 +1,172 @@
+
+class UnMobile extends JPanel implements Runnable
+{
+    int saLargeur, saHauteur, sonDebDessin;
+    final int sonPas = 10, sonTemps=50, sonCote=40;
+    boolean activite;
+    UnMobile(int telleLargeur, int telleHauteur)
+    {
+	super();
+	saLargeur = telleLargeur;
+	saHauteur = telleHauteur;
+	setSize(telleLargeur, telleHauteur);
+    }
+
+    public void run()
+    {
+    activite=true;
+    while(true){
+    	for (sonDebDessin=0; sonDebDessin < 200; sonDebDessin+= sonPas)
+	    	{
+			repaint();
+			try{Thread.sleep(sonTemps);}
+			catch (InterruptedException telleExcp)
+		    	{telleExcp.printStackTrace();}
+	    	}
+
+    	UneFenetre.sem.syncWait();
+    	for (sonDebDessin=200; sonDebDessin < saLargeur - sonPas; sonDebDessin+= sonPas)
+    	{
+		repaint();
+		try{Thread.sleep(sonTemps);}
+		catch (InterruptedException telleExcp)
+	    	{telleExcp.printStackTrace();}
+    	}
+
+    	
+    	for (sonDebDessin=400; sonDebDessin > 200; sonDebDessin-= sonPas)
+    	{
+		repaint();
+		try{Thread.sleep(sonTemps);}
+		catch (InterruptedException telleExcp)
+	    	{telleExcp.printStackTrace();}
+		}
+    	UneFenetre.sem.syncSignal();
+    	
+		for (sonDebDessin=200; sonDebDessin > 0; sonDebDessin-= sonPas)
+		{
+		repaint();
+		try{Thread.sleep(sonTemps);}
+		catch (InterruptedException telleExcp)
+	    	{telleExcp.printStackTrace();}
+		}
+		}
+
+    }
+	 
+
+    public void paintComponent(Graphics telCG)
+    {
+	super.paintComponent(telCG);
+	telCG.fillRect(sonDebDessin, saHauteur/2, sonCote, sonCote);
+    }
+    
+    public boolean getActivite(){
+    	return activite;
+    }
+    
+    public void setActivite(boolean bool){
+    	this.activite=bool;
+    }
+}
+
+
+public abstract class semaphore {
+
+    protected int valeur=0;
+
+    protected semaphore (int valeurInitiale){
+	valeur = valeurInitiale>0 ? valeurInitiale:0;
+    }
+
+    public synchronized void syncWait(){
+	try {
+	    while(valeur<=0){
+		wait();
+        }
+	    valeur--;
+	} catch(InterruptedException e){}
+    }
+
+    public synchronized void syncSignal(){
+	if(++valeur > 0) notifyAll();
+    }
+}
+
+
+public class TpMobile
+{
+    public static void main(String[] telsArgs) 
+    {
+	new UneFenetre();
+ 	
+    }
+}
+
+class UneFenetre extends JFrame {
+    UnMobile sonMobile;
+    UnMobile sonMobile2;
+    UnMobile sonMobile3;
+    UnMobile sonMobile4;
+    
+    Thread laTache;
+    Thread laTache2;
+    Thread laTache3;
+    Thread laTache4;
+    
+    private final int LARG=400, HAUT=250;
+    
+    static SemaphoreBinaire sem=new SemaphoreBinaire(1);
+    
+    public UneFenetre()
+    {
+    ///ajouter sonMobile a la fenetre
+    ///creer une thread laThread avec sonMobile
+    ///afficher la fenetre
+    ///lancer laThread
+    
+    this.setLayout(new GridLayout(4,1));
+    
+    sonMobile=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile);
+    
+    sonMobile2=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile2);
+    
+	sonMobile3=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile3);
+
+    sonMobile4=new UnMobile(LARG,HAUT);	
+    this.add(sonMobile4);
+    
+    this.setSize(800,800);
+    
+	this.setVisible(true);
+    
+    laTache = new Thread(sonMobile);
+	
+	laTache2 = new Thread(sonMobile2);
+	
+	laTache3 = new Thread(sonMobile3);
+	
+	laTache4 = new Thread(sonMobile4);
+
+
+	laTache.start();
+
+	laTache2.start();
+		
+	laTache4.start();
+	
+	laTache3.start();
+		
+
+	
+
+
+
+
+	}
+
+}
+
