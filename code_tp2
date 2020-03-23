@@ -1,0 +1,89 @@
+import java.io.*;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.BufferedReader;
+import java.lang.String;
+
+
+public class Affichage extends Thread{
+	String texte; 
+	
+	//static Section sectionCritique=new Section(); //static comme ça tout le monde a accès à la même zone mutuelle
+	static SemaphoreBinaire semBin=new SemaphoreBinaire(1); ///on met à 1 = dispo
+	public Affichage (String txt){
+		this.texte=txt;
+		}
+	
+	public void run(){
+	
+		semBin.syncWait();
+		System.out.println("J'entre en section critique");
+	   
+		for (int i=0; i<texte.length(); i++){
+	
+		    	System.out.print(texte.charAt(i));
+		
+		    try {
+		    	sleep(100);
+		    	} catch(InterruptedException e){};
+		}
+		semBin.syncSignal();
+		System.out.println("\nJe sors de la section critique");
+	
+	    }
+	
+	}
+//}
+
+public final class SemaphoreBinaire extends semaphore {
+public SemaphoreBinaire(int valeurInitiale){
+	super((valeurInitiale != 0) ? 1:0);
+	//System.out.print(valeurInitiale);
+}
+public final synchronized void syncSignal(){
+	super.syncSignal();
+	//System.out.print(valeur);
+	if (valeur>1) valeur = 1;
+	}
+}
+
+public abstract class semaphore {
+
+    protected int valeur=0;
+
+    protected semaphore (int valeurInitiale){
+	valeur = valeurInitiale>0 ? valeurInitiale:0;
+    }
+
+    public synchronized void syncWait(){
+	try {
+	    while(valeur<=0){
+		wait();
+        }
+	    valeur--;
+	} catch(InterruptedException e){}
+    }
+
+    public synchronized void syncSignal(){
+	if(++valeur > 0) notifyAll();
+    }
+}
+
+public class Main {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Affichage TA = new Affichage("AAA");
+		Affichage TB = new Affichage("BB");
+
+		TB.start();
+
+		TA.start();
+		
+
+	}
+
+}
+
+
+
